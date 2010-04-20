@@ -5,6 +5,7 @@ package org.robotlegs.utilities.pipes.plumbing
     import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
     import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
     import org.puremvc.as3.multicore.utilities.pipes.plumbing.PipeListener;
+    import org.robotlegs.utilities.pipes.events.PipeMessageEvent;
 
     public class ModuleJunction
     {
@@ -121,7 +122,7 @@ package org.robotlegs.utilities.pipes.plumbing
         
         public function handlePipeMessage(message:IPipeMessage):void
         {
-            trace(message.getType(), name);
+            localDispatcher.dispatchEvent(new PipeMessageEvent(PipeMessageEvent.MESSAGE_DISPATCHED, message));
         }
         
         protected var _name:String;

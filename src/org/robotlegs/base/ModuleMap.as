@@ -10,9 +10,10 @@ package org.robotlegs.base
     import org.puremvc.as3.multicore.utilities.pipes.plumbing.TeeMerge;
     import org.puremvc.as3.multicore.utilities.pipes.plumbing.TeeSplit;
     import org.robotlegs.core.IContext;
+    import org.robotlegs.core.IModuleMap;
     import org.robotlegs.utilities.pipes.plumbing.ModuleJunction;
 
-    public class ModuleMap
+    public class ModuleMap implements IModuleMap
     {
         protected var eventDispatcher:IEventDispatcher;
         
@@ -72,7 +73,9 @@ package org.robotlegs.base
             // Connect DoodadModule STDOUT to Shell STDIN
             var junctionTwoToJunctionOne:Pipe = new Pipe();
             var junctionOneInTee:TeeMerge = junctionOne.retrievePipe(ModuleJunction.STDIN_PIPE) as TeeMerge;
+            var junctionTwoOutTee:TeeSplit = junctionTwo.retrievePipe(ModuleJunction.STDOUT_PIPE) as TeeSplit;
             junctionOneInTee.connectInput( junctionTwoToJunctionOne );
+            junctionTwoOutTee.connect(junctionTwoToJunctionOne);
         }
     }
 }

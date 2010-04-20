@@ -12,6 +12,7 @@ package org.robotlegs.mvcs.modular
     import org.robotlegs.core.IInjector;
     import org.robotlegs.core.IMediatorMap;
     import org.robotlegs.core.IModuleContext;
+    import org.robotlegs.core.IModuleMap;
     import org.robotlegs.core.IReflector;
     import org.robotlegs.core.IViewMap;
     import org.robotlegs.mvcs.Context;
@@ -19,10 +20,10 @@ package org.robotlegs.mvcs.modular
     
     public class ModuleContext extends Context implements IModuleContext
     {
-        protected var _moduleMap:ModuleMap;
+        protected var _moduleMap:IModuleMap;
         protected var moduleJunction:ModuleJunction;
         
-        private var _name:String;
+        protected var _name:String;
 
         public function get name():String
         {
@@ -35,17 +36,16 @@ package org.robotlegs.mvcs.modular
             {
                 _name = value;
                 mapInjections();
-                registerModule();
+                if(moduleMap)
+                    registerModule();
             }
         }
-
-        
-        public function ModuleContext(moduleMap:ModuleMap = null, name:String = "", injector:IInjector=null)
+     
+        public function ModuleContext(moduleMap:IModuleMap = null, name:String = "", parentInjector:IInjector=null)
         {
-            super();
-            if(injector)
+            if(parentInjector)
             {
-                this.injector = injector.createChild();
+                injector = parentInjector.createChild();
             }
             _moduleMap = moduleMap;
             _name = name;
@@ -55,33 +55,40 @@ package org.robotlegs.mvcs.modular
         protected function registerModule():void
         {
             if(name)
-                moduleJunction = this.moduleMap.registerContext(this, name);
+                moduleJunction = moduleMap.registerContext(this, name);
         }
         
-        public function set moduleMap(value:ModuleMap):void
+        [Bindable]
+        public function set moduleMap(value:IModuleMap):void
         {
-            _moduleMap = value;
+            
+            if(_moduleMap != value)
+            {
+                _moduleMap = value;
+                if(name)
+                    registerModule();
+            }
+            
         }
         
-        public function get moduleMap():ModuleMap
+        public function get moduleMap():IModuleMap
         {
             return _moduleMap ||= new ModuleMap();
         }
         
         override protected function mapInjections():void
         {
-            injector.mapValue(IReflector, reflector);
-            injector.mapValue(IInjector, injector);
-            injector.mapValue(IEventDispatcher, eventDispatcher);
-            injector.mapValue(DisplayObjectContainer, contextView);
-            injector.mapValue(ICommandMap, commandMap);
-            injector.mapValue(IMediatorMap, mediatorMap);
-            injector.mapValue(IViewMap, viewMap);
-            injector.mapClass(IEventMap, EventMap);
-            injector.mapValue(ModuleMap, moduleMap);
+            super.mapInjections();
+            injector.mapValue(IModuleMap, moduleMap);
             injector.mapValue(ModuleJunction, moduleJunction);
+        }  
+        
+        override protected function checkAutoStartup():void
+        {
+            if (name && moduleMap)
+            {
+                super.checkAutoStartup();
+            }
         }
-        
-        
     }
 }

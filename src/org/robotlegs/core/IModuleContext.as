@@ -1,8 +1,14 @@
 package org.robotlegs.core
 {
-
-    public interface IModuleContext extends IContext
+    public interface IModuleContext
     {
         
+    function get name():String;
+
+    function set name(value:String):void;
+
+    function set moduleMap(value:IModuleMap):void;
+
+    function get moduleMap():IModuleMap;
     }
 }

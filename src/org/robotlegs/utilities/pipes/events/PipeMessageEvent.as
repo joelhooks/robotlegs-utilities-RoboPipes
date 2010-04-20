@@ -6,6 +6,8 @@ package org.robotlegs.utilities.pipes.events
     
     public class PipeMessageEvent extends Event
     {
+        public static const MESSAGE_DISPATCHED:String = "module/messageDispatched";
+        
         private var _message:IPipeMessage;
 
         public function get message():IPipeMessage
